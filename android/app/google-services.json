@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "319575415835",
+    "project_id": "fitness-app-18217",
+    "storage_bucket": "fitness-app-18217.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:319575415835:android:32221a8f183c0360c32cbe",
+        "android_client_info": {
+          "package_name": "com.arlonie.fitnessapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCMY-rTt_VdY9sdteX0AbWENGzyN0x48Rg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
