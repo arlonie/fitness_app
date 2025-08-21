@@ -1,76 +1,117 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/foundation.dart';
+import 'package:firebase_database/firebase_database.dart';
+import 'package:firebase_core/firebase_core.dart';
+import '../models/user_model.dart';
 
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  final DatabaseReference _db = FirebaseDatabase.instanceFor(
+    app: Firebase.app(),
+    databaseURL:
+        "https://fitness-app-18217-default-rtdb.asia-southeast1.firebasedatabase.app/",
+  ).ref();
 
-  //sign up with email and password + send verification
-  Future<User?> signUp(String email, String password) async {
+  // Register new user
+  Future<UserModel?> signUp({
+    required String email,
+    required String password,
+    required String firstname,
+    required String lastname,
+  }) async {
     try {
-      UserCredential userCred = await _auth.createUserWithEmailAndPassword(
+      // Create user in Firebase Auth
+      UserCredential result = await _auth.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
-      // return userCred.user;
-      User? user = userCred.user;
 
-      if (user != null && !user.emailVerified) {
-        await user.sendEmailVerification();
-        if (kDebugMode) {
-          print("Verification email sent to ${user.email}");
+      User? firebaseUser = result.user;
+
+      if (firebaseUser != null) {
+        // Send email verification
+        if (!firebaseUser.emailVerified) {
+          await firebaseUser.sendEmailVerification();
+          print("Verification email sent to $email");
         }
-      }
 
-      return user;
-    } catch (e) {
-      if (kDebugMode) {
-        print("Sign up Error: $e");
-      }
-      return null;
-    }
-  }
+        // Create UserModel
+        UserModel user = UserModel(
+          id: firebaseUser.uid,
+          email: email,
+          firstname: firstname,
+          lastname: lastname,
+          height: null,
+          weight: null,
+          goal: null,
+        );
 
-  //login only if email is verified
-  Future<User?> signIn(String email, String password) async {
-    try {
-      UserCredential userCred = await _auth.signInWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
+        // Save to Realtime Database
+        await _db.child('users/${firebaseUser.uid}').set(user.toJson());
 
-      User? user = userCred.user;
-
-      if (user != null && user.emailVerified) {
         return user;
-      } else {
-        if (kDebugMode) {
-          print("Email not verified for ${user?.email}");
-        }
-        await _auth.signOut();
-        return null;
       }
     } catch (e) {
-      if (kDebugMode) {
-        print("Sign in Error:$e");
+      print("SignUp Error: $e");
+    }
+    return null;
+  }
+
+  // Login user
+  Future<UserModel?> signIn({
+    required String email,
+    required String password,
+  }) async {
+    try {
+      UserCredential result = await _auth.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+
+      User? firebaseUser = result.user;
+
+      if (firebaseUser != null) {
+        // Check email verification
+        if (!firebaseUser.emailVerified) {
+          // Send verification email again if needed
+          await firebaseUser.sendEmailVerification();
+          print("Verification email sent to $email");
+
+          // Throw an error to stop login
+          throw FirebaseAuthException(
+            code: 'email-not-verified',
+            message: '$email is not verified. Please check your inbox or spam.',
+          );
+        }
+
+        // Get user data from Realtime Database
+        DatabaseEvent event = await _db
+            .child('users/${firebaseUser.uid}')
+            .once();
+        final data = event.snapshot.value as Map<dynamic, dynamic>;
+
+        return UserModel.fromJson(Map<String, dynamic>.from(data));
       }
-      return null;
+    } on FirebaseAuthException catch (e) {
+      print("SignIn Error: $e");
+      rethrow; // Pass error to UI to show snackbar or dialog
+    } catch (e) {
+      print("SignIn Error: $e");
     }
+    return null;
   }
 
-  //sign out
-  Future<void> signOut() async {
-    await _auth.signOut();
-    if (kDebugMode) {
-      print("User signed out");
-    }
-  }
-
+  // Reset password
   Future<void> resetPassword(String email) async {
     try {
       await _auth.sendPasswordResetEmail(email: email);
-      debugPrint("Password reset email sent to $email");
     } catch (e) {
-      debugPrint("Password reset error: $e");
+      print("Reset Password Error: $e");
+      rethrow;
     }
+  }
+
+  // Logout
+  Future<void> signOut() async {
+    await _auth.signOut();
   }
 }
