@@ -8,7 +8,7 @@ class HomeScreen extends StatelessWidget {
   void _logout(BuildContext context) async {
     await AuthService().signOut();
 
-    if (!context.mounted) return; // ✅ ensures widget still exists
+    if (!context.mounted) return;
 
     Navigator.pushReplacement(
       context,
@@ -31,65 +31,78 @@ class HomeScreen extends StatelessWidget {
         ),
         child: SafeArea(
           child: Padding(
-            padding: const EdgeInsets.all(24.0),
+            padding: const EdgeInsets.all(20.0),
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Welcome Card
-                Card(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  color: Colors.white.withValues(alpha: 0.9),
-                  elevation: 8,
-                  child: Padding(
-                    padding: const EdgeInsets.all(20.0),
-                    child: Row(
-                      children: [
-                        const Icon(
-                          Icons.fitness_center,
-                          size: 50,
-                          color: Colors.pinkAccent,
+                // 👤 Header Section
+                Row(
+                  children: [
+                    const CircleAvatar(
+                      radius: 30,
+                      backgroundColor: Colors.white,
+                      child: Icon(
+                        Icons.person,
+                        size: 40,
+                        color: Colors.pinkAccent,
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: const [
+                        Text(
+                          "Hello, Athlete! 💪",
+                          style: TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
                         ),
-                        const SizedBox(width: 16),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: const [
-                            Text(
-                              "Welcome!",
-                              style: TextStyle(
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black87,
-                              ),
-                            ),
-                            SizedBox(height: 4),
-                            Text(
-                              "Ready to start your fitness journey?",
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: Colors.black54,
-                              ),
-                            ),
-                          ],
+                        Text(
+                          "Welcome back to your journey",
+                          style: TextStyle(fontSize: 14, color: Colors.white70),
                         ),
                       ],
                     ),
-                  ),
+                  ],
                 ),
-                const SizedBox(height: 40),
 
-                // Placeholder sections
+                const SizedBox(height: 30),
+
+                // 🌟 Feature Cards
                 Expanded(
                   child: ListView(
                     children: [
-                      _featureCard("Track Your Progress", Icons.bar_chart),
-                      _featureCard("Set Your Goals", Icons.flag),
-                      _featureCard("Workout Plans", Icons.fitness_center),
+                      _featureCard(
+                        "Track Your Progress",
+                        Icons.bar_chart,
+                        Colors.blueAccent,
+                        Colors.lightBlue,
+                      ),
+                      _featureCard(
+                        "Set Your Goals",
+                        Icons.flag,
+                        Colors.orangeAccent,
+                        Colors.deepOrange,
+                      ),
+                      _featureCard(
+                        "Workout Plans",
+                        Icons.fitness_center,
+                        Colors.green,
+                        Colors.lightGreen,
+                      ),
+                      _featureCard(
+                        "Nutrition Tips",
+                        Icons.restaurant,
+                        Colors.purpleAccent,
+                        Colors.deepPurple,
+                      ),
                     ],
                   ),
                 ),
 
-                // Logout Button
+                // 🚪 Logout Button
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton.icon(
@@ -97,12 +110,15 @@ class HomeScreen extends StatelessWidget {
                     icon: const Icon(Icons.logout),
                     label: const Text(
                       "Log Out",
-                      style: TextStyle(fontSize: 18),
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       backgroundColor: Colors.yellowAccent.shade700,
-                      foregroundColor: Colors.white,
+                      foregroundColor: Colors.black87,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(30),
                       ),
@@ -118,25 +134,42 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _featureCard(String title, IconData icon) {
-    return Card(
+  Widget _featureCard(
+    String title,
+    IconData icon,
+    Color startColor,
+    Color endColor,
+  ) {
+    return Container(
       margin: const EdgeInsets.only(bottom: 20),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      color: Colors.white.withValues(alpha: 0.9),
-      elevation: 5,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(colors: [startColor, endColor]),
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: startColor.withValues(alpha: 0.4),
+            blurRadius: 8,
+            offset: const Offset(2, 4),
+          ),
+        ],
+      ),
       child: ListTile(
-        leading: Icon(icon, color: Colors.pinkAccent, size: 36),
+        leading: Icon(icon, color: Colors.white, size: 36),
         title: Text(
           title,
           style: const TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
-            color: Colors.black87,
+            color: Colors.white,
           ),
         ),
-        trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+        trailing: const Icon(
+          Icons.arrow_forward_ios,
+          color: Colors.white70,
+          size: 18,
+        ),
         onTap: () {
-          // Placeholder for navigation
+          // 🚀 Navigate to specific feature page
         },
       ),
     );
