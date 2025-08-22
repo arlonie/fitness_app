@@ -26,16 +26,18 @@ class _LoginScreenState extends State<LoginScreen> {
         password: passwordController.text.trim(),
       );
 
-      // Ensure widget is still mounted
       if (!mounted) return;
-
       setState(() => isLoading = false);
 
       if (user != null) {
         final firebaseUser = FirebaseAuth.instance.currentUser;
 
         if (firebaseUser != null && !firebaseUser.emailVerified) {
-          // Unverified user
+          // If the user is not verified → log them out immediately
+          await FirebaseAuth.instance.signOut();
+
+          if (!mounted) return; // ✅ avoid use_build_context_synchronously
+
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
@@ -44,19 +46,20 @@ class _LoginScreenState extends State<LoginScreen> {
               duration: const Duration(seconds: 4),
             ),
           );
-        } else {
-          // Verified user
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("Welcome back, ${user.firstname}!")),
-          );
-
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (_) => const HomeScreen()),
-          );
+          return; // stop here
         }
+
+        // Verified user
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Welcome back, ${user.firstname}!")),
+        );
+
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const HomeScreen()),
+        );
       } else {
-        // Sign-in failed
+        // If signIn returned null
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text("Login failed. Please check your credentials."),
@@ -66,9 +69,34 @@ class _LoginScreenState extends State<LoginScreen> {
     } catch (e) {
       if (!mounted) return;
       setState(() => isLoading = false);
+
+      String message = "An error occurred";
+
+      if (e is FirebaseAuthException) {
+        switch (e.code) {
+          case "user-not-found":
+            message = "No account found for that email.";
+            break;
+          case "wrong-password":
+          case "invalid-credential": // ✅ handle both cases
+            message = "Incorrect password. Please try again.";
+            break;
+          case "invalid-email":
+            message = "The email address is invalid.";
+            break;
+          case "user-disabled":
+            message = "This account has been disabled.";
+            break;
+          default:
+            message = e.message ?? "Authentication failed.";
+        }
+      } else {
+        message = e.toString();
+      }
+
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text("Error: ${e.toString()}")));
+      ).showSnackBar(SnackBar(content: Text(message)));
     }
   }
 

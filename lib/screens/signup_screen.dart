@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -11,46 +12,127 @@ class SignUpScreen extends StatefulWidget {
 class _SignUpScreenState extends State<SignUpScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
   final _firstnameController = TextEditingController();
   final _lastnameController = TextEditingController();
   final AuthService _authService = AuthService();
   bool _loading = false;
 
+  // Validation states
+  bool _isEmailValid = false;
+  bool _isConfirmPasswordValid = false;
+  bool _isPasswordValid = false;
+  bool _isFirstnameValid = false;
+  bool _isLastnameValid = false;
+
+  /// Simple email regex validator
+  bool _validateEmailFormat(String email) {
+    final regex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+    return regex.hasMatch(email);
+  }
+
+  void _onEmailChanged(String value) {
+    setState(() => _isEmailValid = _validateEmailFormat(value.trim()));
+  }
+
+  void _onPasswordChanged(String value) {
+    setState(() => _isPasswordValid = value.trim().length >= 6);
+    _checkConfirmPassword();
+  }
+
+  void _onConfirmPasswordChanged(String _) {
+    _checkConfirmPassword();
+  }
+
+  void _checkConfirmPassword() {
+    final p = _passwordController.text.trim();
+    final c = _confirmPasswordController.text.trim();
+    setState(() => _isConfirmPasswordValid = c.isNotEmpty && p == c);
+  }
+
+  void _onFirstnameChanged(String value) {
+    setState(() => _isFirstnameValid = value.trim().isNotEmpty);
+  }
+
+  void _onLastnameChanged(String value) {
+    setState(() => _isLastnameValid = value.trim().isNotEmpty);
+  }
+
+  bool get _isFormValid =>
+      _isFirstnameValid &&
+      _isLastnameValid &&
+      _isEmailValid &&
+      _isPasswordValid &&
+      _isConfirmPasswordValid;
+
   void _signUp() async {
-    setState(() => _loading = true);
+    if (!_isFormValid) return;
 
-    final user = await _authService.signUp(
-      email: _emailController.text.trim(),
-      password: _passwordController.text.trim(),
-      firstname: _firstnameController.text.trim(),
-      lastname: _lastnameController.text.trim(),
-    );
+    setState(() {
+      _loading = true;
+    });
 
-    if (!mounted) return; // Prevent using context if widget is gone
+    try {
+      final user = await _authService.signUp(
+        email: _emailController.text.trim(),
+        password: _passwordController.text.trim(),
+        firstname: _firstnameController.text.trim(),
+        lastname: _lastnameController.text.trim(),
+      );
 
-    setState(() => _loading = false);
+      if (!mounted) return;
+      setState(() => _loading = false);
 
-    if (user != null) {
-      // Show success snackbar
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-            "Account created! Check your inbox or spam to verify your email.",
+      if (user != null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              "Account created! Check your inbox or spam to verify your email.",
+            ),
+            duration: Duration(seconds: 4),
           ),
-          duration: Duration(seconds: 4),
-        ),
-      );
+        );
 
-      // Go back to login screen after short delay
-      Future.delayed(const Duration(seconds: 2), () {
-        if (mounted) Navigator.pop(context);
-      });
-    } else {
-      // Show failure snackbar
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Sign-up failed. Try again.")),
-      );
+        Future.delayed(const Duration(seconds: 2), () {
+          if (mounted) Navigator.pop(context);
+        });
+      }
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _loading = false);
+
+      String message = "Sign-up failed. Please try again.";
+
+      if (e is FirebaseAuthException) {
+        switch (e.code) {
+          case "invalid-email":
+            message = "That email address is invalid.";
+            break;
+          case "weak-password":
+            message = "Password should be at least 6 characters.";
+            break;
+          case "email-already-in-use":
+            message = "That email is already registered. Try logging in.";
+            break;
+          default:
+            message = e.message ?? "Sign-up failed.";
+        }
+      }
+
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(message)));
     }
+  }
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    _confirmPasswordController.dispose();
+    _firstnameController.dispose();
+    _lastnameController.dispose();
+    super.dispose();
   }
 
   @override
@@ -107,15 +189,22 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       Expanded(
                         child: TextField(
                           controller: _firstnameController,
+                          onChanged: _onFirstnameChanged,
                           decoration: InputDecoration(
                             hintText: "First Name",
                             prefixIcon: const Icon(Icons.person),
+                            suffixIcon: _firstnameController.text.isEmpty
+                                ? null
+                                : Icon(
+                                    _isFirstnameValid
+                                        ? Icons.check_circle
+                                        : Icons.error,
+                                    color: _isFirstnameValid
+                                        ? Colors.green
+                                        : Colors.red,
+                                  ),
                             filled: true,
                             fillColor: Colors.white,
-                            contentPadding: const EdgeInsets.symmetric(
-                              vertical: 16,
-                              horizontal: 20,
-                            ),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(30),
                               borderSide: BorderSide.none,
@@ -127,15 +216,22 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       Expanded(
                         child: TextField(
                           controller: _lastnameController,
+                          onChanged: _onLastnameChanged,
                           decoration: InputDecoration(
                             hintText: "Last Name",
                             prefixIcon: const Icon(Icons.person_outline),
+                            suffixIcon: _lastnameController.text.isEmpty
+                                ? null
+                                : Icon(
+                                    _isLastnameValid
+                                        ? Icons.check_circle
+                                        : Icons.error,
+                                    color: _isLastnameValid
+                                        ? Colors.green
+                                        : Colors.red,
+                                  ),
                             filled: true,
                             fillColor: Colors.white,
-                            contentPadding: const EdgeInsets.symmetric(
-                              vertical: 16,
-                              horizontal: 20,
-                            ),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(30),
                               borderSide: BorderSide.none,
@@ -150,15 +246,18 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   // Email Field
                   TextField(
                     controller: _emailController,
+                    onChanged: _onEmailChanged,
                     decoration: InputDecoration(
                       hintText: "Email",
                       prefixIcon: const Icon(Icons.email),
+                      suffixIcon: _emailController.text.isEmpty
+                          ? null
+                          : Icon(
+                              _isEmailValid ? Icons.check_circle : Icons.error,
+                              color: _isEmailValid ? Colors.green : Colors.red,
+                            ),
                       filled: true,
                       fillColor: Colors.white,
-                      contentPadding: const EdgeInsets.symmetric(
-                        vertical: 16,
-                        horizontal: 20,
-                      ),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(30),
                         borderSide: BorderSide.none,
@@ -171,15 +270,50 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   TextField(
                     controller: _passwordController,
                     obscureText: true,
+                    onChanged: _onPasswordChanged,
                     decoration: InputDecoration(
                       hintText: "Password",
                       prefixIcon: const Icon(Icons.lock),
+                      suffixIcon: _passwordController.text.isEmpty
+                          ? null
+                          : Icon(
+                              _isPasswordValid
+                                  ? Icons.check_circle
+                                  : Icons.error,
+                              color: _isPasswordValid
+                                  ? Colors.green
+                                  : Colors.red,
+                            ),
                       filled: true,
                       fillColor: Colors.white,
-                      contentPadding: const EdgeInsets.symmetric(
-                        vertical: 16,
-                        horizontal: 20,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(30),
+                        borderSide: BorderSide.none,
                       ),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+
+                  // Confirm Password Field
+                  TextField(
+                    controller: _confirmPasswordController,
+                    obscureText: true,
+                    onChanged: _onConfirmPasswordChanged,
+                    decoration: InputDecoration(
+                      hintText: "Confirm Password",
+                      prefixIcon: const Icon(Icons.lock_outline),
+                      suffixIcon: _confirmPasswordController.text.isEmpty
+                          ? null
+                          : Icon(
+                              _isConfirmPasswordValid
+                                  ? Icons.check_circle
+                                  : Icons.error,
+                              color: _isConfirmPasswordValid
+                                  ? Colors.green
+                                  : Colors.red,
+                            ),
+                      filled: true,
+                      fillColor: Colors.white,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(30),
                         borderSide: BorderSide.none,
@@ -192,7 +326,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: _loading ? null : _signUp,
+                      onPressed: _loading || !_isFormValid
+                          ? null
+                          : _signUp, // disable until valid
                       style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         backgroundColor: Colors.yellowAccent.shade700,

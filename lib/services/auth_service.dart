@@ -34,7 +34,6 @@ class AuthService {
         if (!firebaseUser.emailVerified) {
           await firebaseUser.sendEmailVerification();
           logger.i("Verification email sent to $email");
-          // print("Verification email sent to $email");
         }
 
         // Create UserModel
@@ -53,11 +52,14 @@ class AuthService {
 
         return user;
       }
+      return null;
+    } on FirebaseAuthException catch (e) {
+      logger.e("SignUp Error: $e");
+      rethrow; // ✅ let UI handle known Firebase errors
     } catch (e) {
-      logger.i("SignUp Error: $e");
-      // print("SignUp Error: $e");
+      logger.e("Unexpected SignUp Error: $e");
+      rethrow; // ✅ rethrow unexpected errors too
     }
-    return null;
   }
 
   // Login user
