@@ -17,16 +17,24 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     setState(() => _loading = true);
     try {
       await _authService.resetPassword(emailController.text.trim());
+
+      if (!mounted) return; // ✅ prevent using context if widget is disposed
+
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Password reset email sent!")),
       );
       Navigator.pop(context);
     } catch (e) {
+      if (!mounted) return;
+
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Failed to send reset email. Try again.")),
       );
     }
-    setState(() => _loading = false);
+
+    if (mounted) {
+      setState(() => _loading = false);
+    }
   }
 
   @override
