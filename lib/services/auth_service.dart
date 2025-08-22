@@ -2,9 +2,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_core/firebase_core.dart';
 import '../models/user_model.dart';
+import 'package:logger/logger.dart';
 
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  final logger = Logger();
   final DatabaseReference _db = FirebaseDatabase.instanceFor(
     app: Firebase.app(),
     databaseURL:
@@ -31,7 +33,8 @@ class AuthService {
         // Send email verification
         if (!firebaseUser.emailVerified) {
           await firebaseUser.sendEmailVerification();
-          print("Verification email sent to $email");
+          logger.i("Verification email sent to $email");
+          // print("Verification email sent to $email");
         }
 
         // Create UserModel
@@ -51,7 +54,8 @@ class AuthService {
         return user;
       }
     } catch (e) {
-      print("SignUp Error: $e");
+      logger.i("SignUp Error: $e");
+      // print("SignUp Error: $e");
     }
     return null;
   }
@@ -74,7 +78,8 @@ class AuthService {
         if (!firebaseUser.emailVerified) {
           // Send verification email again if needed
           await firebaseUser.sendEmailVerification();
-          print("Verification email sent to $email");
+          logger.i("Verification email sent to $email");
+          // print("Verification email sent to $email");
 
           // Throw an error to stop login
           throw FirebaseAuthException(
@@ -92,10 +97,12 @@ class AuthService {
         return UserModel.fromJson(Map<String, dynamic>.from(data));
       }
     } on FirebaseAuthException catch (e) {
-      print("SignIn Error: $e");
+      logger.i("SignIn Error: $e");
+      // print("SignIn Error: $e");
       rethrow; // Pass error to UI to show snackbar or dialog
     } catch (e) {
-      print("SignIn Error: $e");
+      logger.i("SignIn Error: $e");
+      // print("SignIn Error: $e");
     }
     return null;
   }
@@ -105,7 +112,8 @@ class AuthService {
     try {
       await _auth.sendPasswordResetEmail(email: email);
     } catch (e) {
-      print("Reset Password Error: $e");
+      logger.i("Reset Password Error: $e");
+      // print("Reset Password Error: $e");
       rethrow;
     }
   }

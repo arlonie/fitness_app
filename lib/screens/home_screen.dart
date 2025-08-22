@@ -7,6 +7,9 @@ class HomeScreen extends StatelessWidget {
 
   void _logout(BuildContext context) async {
     await AuthService().signOut();
+
+    if (!context.mounted) return; // ✅ ensures widget still exists
+
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(builder: (_) => const LoginScreen()),
@@ -36,7 +39,7 @@ class HomeScreen extends StatelessWidget {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(20),
                   ),
-                  color: Colors.white.withOpacity(0.9),
+                  color: Colors.white.withValues(alpha: 0.9),
                   elevation: 8,
                   child: Padding(
                     padding: const EdgeInsets.all(20.0),
@@ -119,7 +122,7 @@ class HomeScreen extends StatelessWidget {
     return Card(
       margin: const EdgeInsets.only(bottom: 20),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      color: Colors.white.withOpacity(0.9),
+      color: Colors.white.withValues(alpha: 0.9),
       elevation: 5,
       child: ListTile(
         leading: Icon(icon, color: Colors.pinkAccent, size: 36),
