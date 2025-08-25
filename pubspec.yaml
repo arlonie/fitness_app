@@ -44,9 +44,10 @@ dependencies:
   
 
 dev_dependencies:
+  flutter_native_splash: ^2.4.0
+  
   flutter_test:
     sdk: flutter
-
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
   # activated in the `analysis_options.yaml` file located at the root of your
@@ -57,8 +58,31 @@ dev_dependencies:
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 
+flutter_native_splash:
+  # Light mode
+  color: "#673AB7"
+  image: assets/splash/dumbbell-white.png
+
+  # Dark mode
+  color_dark: "#673AB7"
+  image_dark: assets/splash/dumbbell-white.png
+
+  # Platform switches
+  android: true
+  ios: true
+
+  # Android 12 specific (optional but nice)
+  android_12:
+    image: assets/splash/dumbbell-white.png  # can be same as above or a simpler one
+    color: "#673AB7"
+    image_dark: assets/splash/dumbbell-white.png
+    color_dark: "#673AB7"
+
 # The following section is specific to Flutter packages.
 flutter:
+
+  assets:
+    - assets/splash/dumbbell-white.png
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
