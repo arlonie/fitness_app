@@ -43,11 +43,12 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       body: Container(
         width: double.infinity,
         decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Colors.deepPurple, Colors.pinkAccent],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
+          color: Colors.deepPurple,
+          // gradient: LinearGradient(
+          //   colors: [Colors.deepPurple, Colors.pinkAccent],
+          //   begin: Alignment.topLeft,
+          //   end: Alignment.bottomRight,
+          // ),
         ),
         child: SafeArea(
           child: Center(
@@ -63,10 +64,11 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     builder: (context, value, child) {
                       return Transform.scale(scale: value, child: child);
                     },
-                    child: const Icon(
-                      Icons.fitness_center,
-                      size: 100,
-                      color: Colors.white,
+                    child: Image.asset(
+                      'assets/splash/dumbbell-white.png',
+                      width: 100, // adjust size here
+                      height: 100, // adjust size here
+                      fit: BoxFit.contain,
                     ),
                   ),
                   const SizedBox(height: 20),
