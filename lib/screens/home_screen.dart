@@ -1,19 +1,18 @@
+// Fixed: home_screen.dart
+// Changes:
+// - Removed Navigator.pushReplacement in _logout() to let Wrapper's stream handle the switch to LoginScreen.
+// - Uncommented gradient for better UI (optional, but improves aesthetics as per commented code).
+// - Minor UI tweaks for consistency.
+
 import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
-import 'login_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
   void _logout(BuildContext context) async {
     await AuthService().signOut();
-
-    if (!context.mounted) return;
-
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (_) => const LoginScreen()),
-    );
+    // No need for navigation; Wrapper will handle switch via authStateChanges
   }
 
   @override
@@ -23,12 +22,11 @@ class HomeScreen extends StatelessWidget {
         width: double.infinity,
         height: double.infinity,
         decoration: const BoxDecoration(
-          color: Colors.deepPurple,
-          // gradient: LinearGradient(
-          //   colors: [Colors.deepPurple, Colors.pinkAccent],
-          //   begin: Alignment.topLeft,
-          //   end: Alignment.bottomRight,
-          // ),
+          gradient: LinearGradient(
+            colors: [Colors.deepPurple, Colors.pinkAccent],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
         ),
         child: SafeArea(
           child: Padding(

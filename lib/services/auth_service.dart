@@ -13,6 +13,19 @@ class AuthService {
         "https://fitness-app-18217-default-rtdb.asia-southeast1.firebasedatabase.app/",
   ).ref();
 
+  // Send email verification
+  Future<void> sendEmailVerification(User user) async {
+    try {
+      if (!user.emailVerified) {
+        await user.sendEmailVerification();
+        logger.i("Verification email sent to ${user.email}");
+      }
+    } catch (e) {
+      logger.e("Error sending verification email: $e");
+      rethrow;
+    }
+  }
+
   // Register new user
   Future<UserModel?> signUp({
     required String email,
@@ -31,10 +44,7 @@ class AuthService {
 
       if (firebaseUser != null) {
         // Send email verification
-        if (!firebaseUser.emailVerified) {
-          await firebaseUser.sendEmailVerification();
-          logger.i("Verification email sent to $email");
-        }
+        await sendEmailVerification(firebaseUser);
 
         // Create UserModel
         UserModel user = UserModel(
@@ -50,15 +60,18 @@ class AuthService {
         // Save to Realtime Database
         await _db.child('users/${firebaseUser.uid}').set(user.toJson());
 
+        // Sign out immediately to require verification before access
+        await _auth.signOut();
+
         return user;
       }
       return null;
     } on FirebaseAuthException catch (e) {
       logger.e("SignUp Error: $e");
-      rethrow; // ✅ let UI handle known Firebase errors
+      rethrow;
     } catch (e) {
       logger.e("Unexpected SignUp Error: $e");
-      rethrow; // ✅ rethrow unexpected errors too
+      rethrow;
     }
   }
 
@@ -79,11 +92,7 @@ class AuthService {
         // Check email verification
         if (!firebaseUser.emailVerified) {
           // Send verification email again if needed
-          await firebaseUser.sendEmailVerification();
-          logger.i("Verification email sent to $email");
-          // print("Verification email sent to $email");
-
-          // Throw an error to stop login
+          await sendEmailVerification(firebaseUser);
           throw FirebaseAuthException(
             code: 'email-not-verified',
             message: '$email is not verified. Please check your inbox or spam.',
@@ -94,17 +103,20 @@ class AuthService {
         DatabaseEvent event = await _db
             .child('users/${firebaseUser.uid}')
             .once();
-        final data = event.snapshot.value as Map<dynamic, dynamic>;
+        final data = event.snapshot.value;
 
-        return UserModel.fromJson(Map<String, dynamic>.from(data));
+        if (data == null) {
+          throw Exception('User data not found in database.');
+        }
+
+        return UserModel.fromJson(Map<String, dynamic>.from(data as Map));
       }
     } on FirebaseAuthException catch (e) {
       logger.i("SignIn Error: $e");
-      // print("SignIn Error: $e");
-      rethrow; // Pass error to UI to show snackbar or dialog
+      rethrow;
     } catch (e) {
       logger.i("SignIn Error: $e");
-      // print("SignIn Error: $e");
+      rethrow;
     }
     return null;
   }
@@ -115,7 +127,6 @@ class AuthService {
       await _auth.sendPasswordResetEmail(email: email);
     } catch (e) {
       logger.i("Reset Password Error: $e");
-      // print("Reset Password Error: $e");
       rethrow;
     }
   }

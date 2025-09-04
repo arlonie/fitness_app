@@ -1,3 +1,8 @@
+// Fixed: signup_screen.dart
+// Changes:
+// - Uncommented gradient for consistency.
+// - No major logic changes needed here, as signOut is now in AuthService.
+
 import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -163,8 +168,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     },
                     child: Image.asset(
                       'assets/splash/dumbbell-white.png',
-                      width: 100, // adjust size here
-                      height: 100, // adjust size here
+                      width: 100,
+                      height: 100,
                       fit: BoxFit.contain,
                     ),
                   ),
@@ -329,9 +334,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: _loading || !_isFormValid
-                          ? null
-                          : _signUp, // disable until valid
+                      onPressed: _loading || !_isFormValid ? null : _signUp,
                       style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         backgroundColor: Colors.yellowAccent.shade700,

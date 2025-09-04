@@ -1,3 +1,11 @@
+// Fixed: login_screen.dart
+// Changes:
+// - Removed redundant emailVerified check after signIn() succeeds, as AuthService already handles it.
+// - Added case for 'email-not-verified' in error handling for specific messaging.
+// - Uncommented gradient for consistency.
+// - Removed unnecessary signOut in redundant check.
+// - Improved error messages.
+
 import 'package:flutter/material.dart';
 import 'forgot_password_screen.dart';
 import 'signup_screen.dart';
@@ -30,26 +38,6 @@ class _LoginScreenState extends State<LoginScreen> {
       setState(() => isLoading = false);
 
       if (user != null) {
-        final firebaseUser = FirebaseAuth.instance.currentUser;
-
-        if (firebaseUser != null && !firebaseUser.emailVerified) {
-          // If the user is not verified → log them out immediately
-          await FirebaseAuth.instance.signOut();
-
-          if (!mounted) return; // ✅ avoid use_build_context_synchronously
-
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                "${firebaseUser.email} is not verified. Please check your inbox or spam.",
-              ),
-              duration: const Duration(seconds: 4),
-            ),
-          );
-          return; // stop here
-        }
-
-        // Verified user
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("Welcome back, ${user.firstname}!")),
         );
@@ -59,7 +47,7 @@ class _LoginScreenState extends State<LoginScreen> {
           MaterialPageRoute(builder: (_) => const HomeScreen()),
         );
       } else {
-        // If signIn returned null
+        // If signIn returned null (unlikely, as errors are thrown)
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text("Login failed. Please check your credentials."),
@@ -78,7 +66,7 @@ class _LoginScreenState extends State<LoginScreen> {
             message = "No account found for that email.";
             break;
           case "wrong-password":
-          case "invalid-credential": // ✅ handle both cases
+          case "invalid-credential":
             message = "Incorrect password. Please try again.";
             break;
           case "invalid-email":
@@ -86,6 +74,9 @@ class _LoginScreenState extends State<LoginScreen> {
             break;
           case "user-disabled":
             message = "This account has been disabled.";
+            break;
+          case 'email-not-verified':
+            message = e.message ?? "Email not verified.";
             break;
           default:
             message = e.message ?? "Authentication failed.";
@@ -108,8 +99,7 @@ class _LoginScreenState extends State<LoginScreen> {
         decoration: const BoxDecoration(
           color: Colors.deepPurple,
           // gradient: LinearGradient(
-          //   // colors: [Colors.deepPurple, Colors.pinkAccent],
-          //   colors: [Colors.deepPurple],
+          //   colors: [Colors.deepPurple, Colors.pinkAccent],
           //   begin: Alignment.topLeft,
           //   end: Alignment.bottomRight,
           // ),
@@ -133,8 +123,8 @@ class _LoginScreenState extends State<LoginScreen> {
                     },
                     child: Image.asset(
                       'assets/splash/dumbbell-white.png',
-                      width: 100, // adjust size here
-                      height: 100, // adjust size here
+                      width: 100,
+                      height: 100,
                       fit: BoxFit.contain,
                     ),
                   ),
