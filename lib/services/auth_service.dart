@@ -13,6 +13,12 @@ class AuthService {
         "https://fitness-app-18217-default-rtdb.asia-southeast1.firebasedatabase.app/",
   ).ref();
 
+  // Getter for current user
+  User? get currentUser => _auth.currentUser;
+
+  // Getter for database reference
+  DatabaseReference get database => _db;
+
   // Send email verification
   Future<void> sendEmailVerification(User user) async {
     try {
@@ -34,7 +40,6 @@ class AuthService {
     required String lastname,
   }) async {
     try {
-      // Create user in Firebase Auth
       UserCredential result = await _auth.createUserWithEmailAndPassword(
         email: email,
         password: password,
@@ -43,10 +48,7 @@ class AuthService {
       User? firebaseUser = result.user;
 
       if (firebaseUser != null) {
-        // Send email verification
         await sendEmailVerification(firebaseUser);
-
-        // Create UserModel
         UserModel user = UserModel(
           id: firebaseUser.uid,
           email: email,
@@ -56,13 +58,8 @@ class AuthService {
           weight: null,
           goal: null,
         );
-
-        // Save to Realtime Database
         await _db.child('users/${firebaseUser.uid}').set(user.toJson());
-
-        // Sign out immediately to require verification before access
         await _auth.signOut();
-
         return user;
       }
       return null;
@@ -89,9 +86,7 @@ class AuthService {
       User? firebaseUser = result.user;
 
       if (firebaseUser != null) {
-        // Check email verification
         if (!firebaseUser.emailVerified) {
-          // Send verification email again if needed
           await sendEmailVerification(firebaseUser);
           throw FirebaseAuthException(
             code: 'email-not-verified',
@@ -99,7 +94,6 @@ class AuthService {
           );
         }
 
-        // Get user data from Realtime Database
         DatabaseEvent event = await _db
             .child('users/${firebaseUser.uid}')
             .once();
