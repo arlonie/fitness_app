@@ -1,7 +1,9 @@
+// wrapper.dart (unchanged, just confirming correctness)
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'home_screen.dart';
 import 'login_screen.dart';
+import 'verify_email_screen.dart';
 
 class Wrapper extends StatelessWidget {
   const Wrapper({super.key});
@@ -11,19 +13,21 @@ class Wrapper extends StatelessWidget {
     return StreamBuilder<User?>(
       stream: FirebaseAuth.instance.authStateChanges(),
       builder: (context, snapshot) {
-        // While checking auth state → show loading screen
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Scaffold(
             body: Center(child: CircularProgressIndicator()),
           );
         }
 
-        // If logged in → go to home
-        if (snapshot.hasData) {
-          return const HomeScreen();
+        final user = snapshot.data;
+        if (user != null) {
+          if (user.emailVerified) {
+            return const HomeScreen();
+          } else {
+            return const VerifyEmailScreen();
+          }
         }
 
-        // If not logged in → go to login
         return const LoginScreen();
       },
     );
