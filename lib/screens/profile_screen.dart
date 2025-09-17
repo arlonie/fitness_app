@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/services.dart'; // Added for inputFormatters
 import '../services/auth_service.dart';
 import '../services/user_service.dart';
@@ -24,7 +23,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
   late TextEditingController _weightController;
   late TextEditingController _goalController;
 
-  bool _isLoading = false;
   bool _isSaving = false;
 
   Future<UserModel?> _fetchUserData() async {
