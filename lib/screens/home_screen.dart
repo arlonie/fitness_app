@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
 import '../models/user_model.dart';
+import 'profile_screen.dart'; // Import the new ProfileScreen
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -26,11 +27,6 @@ class _HomeScreenState extends State<HomeScreen> {
       }
     }
     return null;
-  }
-
-  void _logout(BuildContext context) async {
-    await _authService.signOut();
-    // Wrapper handles navigation via authStateChanges
   }
 
   @override
@@ -60,15 +56,25 @@ class _HomeScreenState extends State<HomeScreen> {
                   // Header Section
                   Row(
                     children: [
-                      CircleAvatar(
-                        radius: 30,
-                        backgroundColor: isDarkTheme
-                            ? Colors.grey[800]
-                            : Colors.grey[200],
-                        child: Icon(
-                          Icons.person,
-                          size: 40,
-                          color: Theme.of(context).colorScheme.primary,
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const ProfileScreen(),
+                            ),
+                          );
+                        },
+                        child: CircleAvatar(
+                          radius: 30,
+                          backgroundColor: isDarkTheme
+                              ? Colors.grey[800]
+                              : Colors.grey[200],
+                          child: Icon(
+                            Icons.person,
+                            size: 40,
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
                         ),
                       ),
                       const SizedBox(width: 16),
@@ -134,38 +140,6 @@ class _HomeScreenState extends State<HomeScreen> {
                               _showFeatureSnackBar(context, "Nutrition Tips"),
                         ),
                       ],
-                    ),
-                  ),
-
-                  // Logout Button
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton.icon(
-                      onPressed: () => _logout(context),
-                      icon: const Icon(Icons.logout),
-                      label: const Text(
-                        "Log Out",
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(
-                          vertical: 16,
-                          horizontal: 24,
-                        ),
-                        backgroundColor: Theme.of(context).colorScheme.primary,
-                        foregroundColor: isDarkTheme
-                            ? Colors.black
-                            : Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30),
-                        ),
-                        elevation: isDarkTheme
-                            ? 0
-                            : 6, // No elevation in dark mode
-                      ),
                     ),
                   ),
                 ],
