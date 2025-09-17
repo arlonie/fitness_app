@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/services.dart'; // Added for inputFormatters
 import '../services/auth_service.dart';
-import '../services/user_service.dart'; // Import the new UserService
+import '../services/user_service.dart';
 import '../models/user_model.dart';
-import 'login_screen.dart'; // For navigation after logout if needed
+import 'login_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -14,11 +15,9 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   final AuthService _authService = AuthService();
-  final UserService _userService =
-      UserService(); // Use UserService for profile updates
+  final UserService _userService = UserService();
   final _formKey = GlobalKey<FormState>();
 
-  // Controllers for editable fields
   late TextEditingController _firstnameController;
   late TextEditingController _lastnameController;
   late TextEditingController _heightController;
@@ -28,7 +27,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
   bool _isLoading = false;
   bool _isSaving = false;
 
-  // Fetch user data
   Future<UserModel?> _fetchUserData() async {
     final user = _authService.currentUser;
     if (user != null) {
@@ -46,7 +44,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   void initState() {
     super.initState();
-    // Initialize controllers (will be set in FutureBuilder)
     _firstnameController = TextEditingController();
     _lastnameController = TextEditingController();
     _heightController = TextEditingController();
@@ -80,10 +77,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             : _goalController.text.trim(),
       };
 
-      await _userService.updateUserProfile(
-        currentUser.id,
-        updates,
-      ); // Use UserService
+      await _userService.updateUserProfile(currentUser.id, updates);
 
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -103,7 +97,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   void _logout() async {
     await _authService.signOut();
-    // Wrapper will handle navigation, but to be safe:
     if (mounted) {
       Navigator.pushReplacement(
         context,
@@ -122,6 +115,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
         backgroundColor: isDarkTheme ? Colors.grey[900] : Colors.white,
         foregroundColor: isDarkTheme ? Colors.white : Colors.black87,
         elevation: 0,
+        actions: [
+          IconButton(
+            onPressed: _logout,
+            icon: const Icon(Icons.logout),
+            tooltip: "Log Out",
+            color: Colors.redAccent,
+          ),
+        ],
       ),
       backgroundColor: isDarkTheme ? Colors.black : Colors.white,
       body: SafeArea(
@@ -139,7 +140,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 return const Center(child: Text("Error loading profile"));
               }
 
-              // Set controller values once data is loaded
               _firstnameController.text = user.firstname;
               _lastnameController.text = user.lastname;
               _heightController.text = user.height?.toString() ?? '';
@@ -183,8 +183,32 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           "First Name",
                           isDarkTheme,
                         ),
-                        validator: (value) =>
-                            value!.trim().isEmpty ? "Required" : null,
+                        maxLength: 50,
+                        inputFormatters: [
+                          FilteringTextInputFormatter.allow(
+                            RegExp(r'[a-zA-Z\s]'),
+                          ),
+                        ],
+                        onChanged: (value) {
+                          if (value.isNotEmpty) {
+                            _firstnameController.value = _firstnameController
+                                .value
+                                .copyWith(
+                                  text:
+                                      value[0].toUpperCase() +
+                                      value.substring(1).toLowerCase(),
+                                );
+                          }
+                        },
+                        validator: (value) {
+                          if (value == null || value.trim().isEmpty) {
+                            return "First name is required";
+                          }
+                          if (value.trim().length > 50) {
+                            return "First name must be 50 characters or less";
+                          }
+                          return null;
+                        },
                       ),
                       const SizedBox(height: 16),
 
@@ -195,23 +219,77 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           "Last Name",
                           isDarkTheme,
                         ),
-                        validator: (value) =>
-                            value!.trim().isEmpty ? "Required" : null,
+                        maxLength: 50,
+                        inputFormatters: [
+                          FilteringTextInputFormatter.allow(
+                            RegExp(r'[a-zA-Z\s]'),
+                          ),
+                        ],
+                        onChanged: (value) {
+                          if (value.isNotEmpty) {
+                            _lastnameController.value = _lastnameController
+                                .value
+                                .copyWith(
+                                  text:
+                                      value[0].toUpperCase() +
+                                      value.substring(1).toLowerCase(),
+                                );
+                          }
+                        },
+                        validator: (value) {
+                          if (value == null || value.trim().isEmpty) {
+                            return "Last name is required";
+                          }
+                          if (value.trim().length > 50) {
+                            return "Last name must be 50 characters or less";
+                          }
+                          return null;
+                        },
                       ),
                       const SizedBox(height: 16),
 
                       // Height
                       TextFormField(
                         controller: _heightController,
-                        decoration: _buildInputDecoration(
-                          "Height (cm)",
-                          isDarkTheme,
+                        decoration:
+                            _buildInputDecoration(
+                              "Height (cm)",
+                              isDarkTheme,
+                            ).copyWith(
+                              prefixIcon: Icon(
+                                Icons.straighten,
+                                color: Theme.of(context).colorScheme.primary,
+                              ),
+                            ),
+                        maxLength: 5,
+                        inputFormatters: [
+                          FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
+                        ],
+                        onChanged: (value) {
+                          if (value.isNotEmpty &&
+                              !RegExp(r'^\d*\.?\d*$').hasMatch(value)) {
+                            _heightController.value = _heightController.value
+                                .copyWith(
+                                  text: value.replaceAll(
+                                    RegExp(r'[^0-9.]'),
+                                    '',
+                                  ),
+                                );
+                          }
+                        },
+                        keyboardType: TextInputType.numberWithOptions(
+                          decimal: true,
                         ),
-                        keyboardType: TextInputType.number,
                         validator: (value) {
-                          if (value!.trim().isNotEmpty) {
-                            if (double.tryParse(value) == null)
-                              return "Invalid number";
+                          if (value == null || value.trim().isEmpty) {
+                            return "Height is required";
+                          }
+                          final num = double.tryParse(value.trim());
+                          if (num == null) {
+                            return "Invalid height";
+                          }
+                          if (num < 100 || num > 250) {
+                            return "Height must be between 100-250 cm";
                           }
                           return null;
                         },
@@ -221,15 +299,45 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       // Weight
                       TextFormField(
                         controller: _weightController,
-                        decoration: _buildInputDecoration(
-                          "Weight (kg)",
-                          isDarkTheme,
+                        decoration:
+                            _buildInputDecoration(
+                              "Weight (kg)",
+                              isDarkTheme,
+                            ).copyWith(
+                              prefixIcon: Icon(
+                                Icons.monitor_weight,
+                                color: Theme.of(context).colorScheme.primary,
+                              ),
+                            ),
+                        maxLength: 5,
+                        inputFormatters: [
+                          FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
+                        ],
+                        onChanged: (value) {
+                          if (value.isNotEmpty &&
+                              !RegExp(r'^\d*\.?\d*$').hasMatch(value)) {
+                            _weightController.value = _weightController.value
+                                .copyWith(
+                                  text: value.replaceAll(
+                                    RegExp(r'[^0-9.]'),
+                                    '',
+                                  ),
+                                );
+                          }
+                        },
+                        keyboardType: TextInputType.numberWithOptions(
+                          decimal: true,
                         ),
-                        keyboardType: TextInputType.number,
                         validator: (value) {
-                          if (value!.trim().isNotEmpty) {
-                            if (double.tryParse(value) == null)
-                              return "Invalid number";
+                          if (value == null || value.trim().isEmpty) {
+                            return "Weight is required";
+                          }
+                          final num = double.tryParse(value.trim());
+                          if (num == null) {
+                            return "Invalid weight";
+                          }
+                          if (num < 30 || num > 200) {
+                            return "Weight must be between 30-200 kg";
                           }
                           return null;
                         },
@@ -243,6 +351,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           "Fitness Goal",
                           isDarkTheme,
                         ),
+                        maxLength: 100,
+                        inputFormatters: [
+                          FilteringTextInputFormatter.allow(
+                            RegExp(
+                              r'[a-zA-Z0-9\s.,!-]',
+                            ), // Allows letters, numbers, spaces, and basic punctuation
+                          ),
+                        ],
+                        validator: (value) {
+                          if (value != null && value.trim().length > 100) {
+                            return "Goal must be 100 characters or less";
+                          }
+                          return null;
+                        },
                       ),
                       const SizedBox(height: 30),
 
@@ -283,34 +405,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                       ),
                       const SizedBox(height: 20),
-
-                      // Logout Button
-                      SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton.icon(
-                          onPressed: _logout,
-                          icon: const Icon(Icons.logout),
-                          label: const Text(
-                            "Log Out",
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          style: ElevatedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(
-                              vertical: 16,
-                              horizontal: 24,
-                            ),
-                            backgroundColor: Colors.redAccent,
-                            foregroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(30),
-                            ),
-                            elevation: isDarkTheme ? 0 : 6,
-                          ),
-                        ),
-                      ),
                     ],
                   ),
                 ),
@@ -328,12 +422,36 @@ class _ProfileScreenState extends State<ProfileScreen> {
       labelStyle: TextStyle(
         color: isDarkTheme ? Colors.white70 : Colors.black54,
       ),
+      hintText: "Enter your $label",
+      hintStyle: TextStyle(
+        color: isDarkTheme ? Colors.white54 : Colors.black45,
+      ),
       filled: true,
       fillColor: isDarkTheme ? Colors.grey[800] : Colors.grey[200],
+      contentPadding: const EdgeInsets.symmetric(
+        vertical: 18.0,
+        horizontal: 16.0,
+      ),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
         borderSide: BorderSide.none,
       ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide.none,
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(
+          color: Theme.of(context).colorScheme.primary,
+          width: 2.0,
+        ),
+      ),
+      errorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(color: Colors.redAccent, width: 2.0),
+      ),
+      errorStyle: const TextStyle(color: Colors.redAccent, fontSize: 14.0),
     );
   }
 }

@@ -169,7 +169,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ? []
             : [
                 BoxShadow(
-                  color: Colors.grey.withOpacity(.2),
+                  color: Colors.grey.withValues(alpha: .2),
                   blurRadius: 6,
                   offset: const Offset(0, 2),
                 ),
