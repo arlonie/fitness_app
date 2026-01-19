@@ -34,117 +34,128 @@ class _HomeScreenState extends State<HomeScreen> {
     final isDarkTheme = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: isDarkTheme ? Colors.black : Colors.white,
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: FutureBuilder<UserModel?>(
-            future: _fetchUserData(),
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(child: CircularProgressIndicator());
-              }
+      backgroundColor: isDarkTheme ? Colors.black87 : Colors.white,
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: isDarkTheme
+                ? [Colors.black87, Colors.grey[900]!]
+                : [Colors.white, Colors.grey[50]!],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+        ),
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: FutureBuilder<UserModel?>(
+              future: _fetchUserData(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
 
-              final user = snapshot.data;
-              final greeting = user != null
-                  ? "Hello, ${user.firstname}!"
-                  : "Hello, Athlete!";
+                final user = snapshot.data;
+                final greeting = user != null
+                    ? "Hello, ${user.firstname}!"
+                    : "Hello, Athlete!";
 
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Header Section
-                  Row(
-                    children: [
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => const ProfileScreen(),
-                            ),
-                          );
-                        },
-                        child: CircleAvatar(
-                          radius: 30,
-                          backgroundColor: isDarkTheme
-                              ? Colors.grey[800]
-                              : Colors.grey[200],
-                          child: Icon(
-                            Icons.person,
-                            size: 40,
-                            color: Theme.of(context).colorScheme.primary,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 16),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            greeting,
-                            style: TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                              color: isDarkTheme
-                                  ? Colors.white
-                                  : Colors.black87,
-                            ),
-                          ),
-                          Text(
-                            "Let's continue your fitness journey",
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: isDarkTheme
-                                  ? Colors.white70
-                                  : Colors.black54,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-
-                  const SizedBox(height: 30),
-
-                  // Feature Cards
-                  Expanded(
-                    child: ListView(
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Header Section
+                    Row(
                       children: [
-                        _buildFeatureCard(
-                          context,
-                          title: "Track Your Progress",
-                          icon: Icons.bar_chart,
-                          onTap: () =>
-                              _showFeatureSnackBar(context, "Track Progress"),
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const ProfileScreen(),
+                              ),
+                            );
+                          },
+                          child: CircleAvatar(
+                            radius: 30,
+                            backgroundColor: isDarkTheme
+                                ? Colors.grey[800]
+                                : Colors.grey[200],
+                            child: Icon(
+                              Icons.person,
+                              size: 40,
+                              color: Theme.of(context).colorScheme.primary,
+                            ),
+                          ),
                         ),
-                        _buildFeatureCard(
-                          context,
-                          title: "Set Your Goals",
-                          icon: Icons.flag,
-                          onTap: () =>
-                              _showFeatureSnackBar(context, "Set Goals"),
-                        ),
-                        _buildFeatureCard(
-                          context,
-                          title: "Workout Plans",
-                          icon: Icons.fitness_center,
-                          onTap: () =>
-                              _showFeatureSnackBar(context, "Workout Plans"),
-                        ),
-                        _buildFeatureCard(
-                          context,
-                          title: "Nutrition Tips",
-                          icon: Icons.restaurant,
-                          onTap: () =>
-                              _showFeatureSnackBar(context, "Nutrition Tips"),
+                        const SizedBox(width: 16),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              greeting,
+                              style: TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                                color: isDarkTheme
+                                    ? Colors.white
+                                    : Colors.black87,
+                              ),
+                            ),
+                            Text(
+                              "Let's continue your fitness journey",
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: isDarkTheme
+                                    ? Colors.white70
+                                    : Colors.black54,
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
-                  ),
-                ],
-              );
-            },
+
+                    const SizedBox(height: 30),
+
+                    // Feature Cards
+                    Expanded(
+                      child: ListView(
+                        children: [
+                          _buildFeatureCard(
+                            context,
+                            title: "Track Your Progress",
+                            icon: Icons.bar_chart,
+                            onTap: () =>
+                                _showFeatureSnackBar(context, "Track Progress"),
+                          ),
+                          _buildFeatureCard(
+                            context,
+                            title: "Set Your Goals",
+                            icon: Icons.flag,
+                            onTap: () =>
+                                _showFeatureSnackBar(context, "Set Goals"),
+                          ),
+                          _buildFeatureCard(
+                            context,
+                            title: "Workout Plans",
+                            icon: Icons.fitness_center,
+                            onTap: () =>
+                                _showFeatureSnackBar(context, "Workout Plans"),
+                          ),
+                          _buildFeatureCard(
+                            context,
+                            title: "Nutrition Tips",
+                            icon: Icons.restaurant,
+                            onTap: () =>
+                                _showFeatureSnackBar(context, "Nutrition Tips"),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                );
+              },
+            ),
           ),
         ),
       ),
@@ -163,17 +174,19 @@ class _HomeScreenState extends State<HomeScreen> {
       duration: const Duration(milliseconds: 300),
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
-        color: isDarkTheme ? Colors.grey[850] : Colors.grey[100],
+        color: isDarkTheme ? Colors.grey[800] : Colors.white,
         borderRadius: BorderRadius.circular(16),
-        boxShadow: isDarkTheme
-            ? []
-            : [
-                BoxShadow(
-                  color: Colors.grey.withValues(alpha: .2),
-                  blurRadius: 6,
-                  offset: const Offset(0, 2),
-                ),
-              ],
+        border: Border.all(
+          color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
+          width: 1,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Material(
         color: Colors.transparent,

@@ -93,6 +93,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkTheme = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
       body: Container(
         width: double.infinity,
@@ -150,9 +152,17 @@ class _LoginScreenState extends State<LoginScreen> {
                   // Email Field
                   TextField(
                     controller: emailController,
+                    style: TextStyle(
+                      color: isDarkTheme ? Colors.black : Colors.black87,
+                    ),
                     decoration: InputDecoration(
                       hintText: "Email",
-                      prefixIcon: const Icon(Icons.email),
+                      hintStyle: TextStyle(
+                        color: isDarkTheme
+                            ? Colors.grey[600]
+                            : Colors.grey[500],
+                      ),
+                      prefixIcon: Icon(Icons.email, color: Colors.grey[600]),
                       filled: true,
                       fillColor: Colors.white,
                       contentPadding: const EdgeInsets.symmetric(
@@ -170,10 +180,18 @@ class _LoginScreenState extends State<LoginScreen> {
                   // Password Field
                   TextField(
                     controller: passwordController,
+                    style: TextStyle(
+                      color: isDarkTheme ? Colors.black : Colors.black87,
+                    ),
                     obscureText: true,
                     decoration: InputDecoration(
                       hintText: "Password",
-                      prefixIcon: const Icon(Icons.lock),
+                      hintStyle: TextStyle(
+                        color: isDarkTheme
+                            ? Colors.grey[600]
+                            : Colors.grey[500],
+                      ),
+                      prefixIcon: Icon(Icons.lock, color: Colors.grey[600]),
                       filled: true,
                       fillColor: Colors.white,
                       contentPadding: const EdgeInsets.symmetric(

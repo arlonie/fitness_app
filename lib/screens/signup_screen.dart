@@ -142,6 +142,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkTheme = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
       body: Container(
         width: double.infinity,
@@ -197,10 +199,21 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       Expanded(
                         child: TextField(
                           controller: _firstnameController,
+                          style: TextStyle(
+                            color: isDarkTheme ? Colors.black : Colors.black87,
+                          ),
                           onChanged: _onFirstnameChanged,
                           decoration: InputDecoration(
                             hintText: "First Name",
-                            prefixIcon: const Icon(Icons.person),
+                            hintStyle: TextStyle(
+                              color: isDarkTheme
+                                  ? Colors.grey[600]
+                                  : Colors.grey[500],
+                            ),
+                            prefixIcon: Icon(
+                              Icons.person,
+                              color: Colors.grey[600],
+                            ),
                             suffixIcon: _firstnameController.text.isEmpty
                                 ? null
                                 : Icon(
@@ -224,10 +237,21 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       Expanded(
                         child: TextField(
                           controller: _lastnameController,
+                          style: TextStyle(
+                            color: isDarkTheme ? Colors.black : Colors.black87,
+                          ),
                           onChanged: _onLastnameChanged,
                           decoration: InputDecoration(
                             hintText: "Last Name",
-                            prefixIcon: const Icon(Icons.person_outline),
+                            hintStyle: TextStyle(
+                              color: isDarkTheme
+                                  ? Colors.grey[600]
+                                  : Colors.grey[500],
+                            ),
+                            prefixIcon: Icon(
+                              Icons.person_outline,
+                              color: Colors.grey[600],
+                            ),
                             suffixIcon: _lastnameController.text.isEmpty
                                 ? null
                                 : Icon(
@@ -254,10 +278,18 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   // Email Field
                   TextField(
                     controller: _emailController,
+                    style: TextStyle(
+                      color: isDarkTheme ? Colors.black : Colors.black87,
+                    ),
                     onChanged: _onEmailChanged,
                     decoration: InputDecoration(
                       hintText: "Email",
-                      prefixIcon: const Icon(Icons.email),
+                      hintStyle: TextStyle(
+                        color: isDarkTheme
+                            ? Colors.grey[600]
+                            : Colors.grey[500],
+                      ),
+                      prefixIcon: Icon(Icons.email, color: Colors.grey[600]),
                       suffixIcon: _emailController.text.isEmpty
                           ? null
                           : Icon(
@@ -277,11 +309,19 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   // Password Field
                   TextField(
                     controller: _passwordController,
+                    style: TextStyle(
+                      color: isDarkTheme ? Colors.black : Colors.black87,
+                    ),
                     obscureText: true,
                     onChanged: _onPasswordChanged,
                     decoration: InputDecoration(
                       hintText: "Password",
-                      prefixIcon: const Icon(Icons.lock),
+                      hintStyle: TextStyle(
+                        color: isDarkTheme
+                            ? Colors.grey[600]
+                            : Colors.grey[500],
+                      ),
+                      prefixIcon: Icon(Icons.lock, color: Colors.grey[600]),
                       suffixIcon: _passwordController.text.isEmpty
                           ? null
                           : Icon(
@@ -305,11 +345,22 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   // Confirm Password Field
                   TextField(
                     controller: _confirmPasswordController,
+                    style: TextStyle(
+                      color: isDarkTheme ? Colors.black : Colors.black87,
+                    ),
                     obscureText: true,
                     onChanged: _onConfirmPasswordChanged,
                     decoration: InputDecoration(
                       hintText: "Confirm Password",
-                      prefixIcon: const Icon(Icons.lock_outline),
+                      hintStyle: TextStyle(
+                        color: isDarkTheme
+                            ? Colors.grey[600]
+                            : Colors.grey[500],
+                      ),
+                      prefixIcon: Icon(
+                        Icons.lock_outline,
+                        color: Colors.grey[600],
+                      ),
                       suffixIcon: _confirmPasswordController.text.isEmpty
                           ? null
                           : Icon(
