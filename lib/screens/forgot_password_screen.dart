@@ -39,6 +39,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkTheme = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
       body: Container(
         width: double.infinity,
@@ -94,9 +96,17 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   // Email Field
                   TextField(
                     controller: emailController,
+                    style: TextStyle(
+                      color: isDarkTheme ? Colors.black : Colors.black87,
+                    ),
                     decoration: InputDecoration(
-                      hintText: "Email",
-                      prefixIcon: const Icon(Icons.email),
+                      hintText: "Email Address",
+                      hintStyle: TextStyle(
+                        color: isDarkTheme
+                            ? Colors.grey[600]
+                            : Colors.grey[500],
+                      ),
+                      prefixIcon: Icon(Icons.email, color: Colors.grey[600]),
                       filled: true,
                       fillColor: Colors.white,
                       contentPadding: const EdgeInsets.symmetric(
@@ -104,8 +114,22 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                         horizontal: 20,
                       ),
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(32),
+                        borderRadius: BorderRadius.circular(12),
                         borderSide: BorderSide.none,
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(
+                          color: Colors.grey[300]!,
+                          width: 1,
+                        ),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(
+                          color: Colors.yellowAccent.shade700,
+                          width: 2,
+                        ),
                       ),
                     ),
                   ),
