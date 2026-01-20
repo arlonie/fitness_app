@@ -109,12 +109,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Profile"),
+        title: const Text(
+          "Profile",
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.w900,
+            letterSpacing: 0.5,
+          ),
+        ),
         backgroundColor: isDarkTheme
             ? Colors.deepPurple[900]
             : Colors.deepPurple,
         foregroundColor: Colors.white,
         elevation: 0,
+        centerTitle: false,
         actions: [
           IconButton(
             onPressed: _logout,
@@ -162,40 +170,117 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        // Profile Avatar
-                        CircleAvatar(
-                          radius: 60,
-                          backgroundColor: Theme.of(
-                            context,
-                          ).colorScheme.primary.withValues(alpha: 0.2),
-                          child: Icon(
-                            Icons.person,
-                            size: 80,
-                            color: Theme.of(context).colorScheme.primary,
+                        // Profile Avatar with modern design
+                        Container(
+                          padding: const EdgeInsets.all(4),
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [
+                                Theme.of(
+                                  context,
+                                ).colorScheme.primary.withValues(alpha: 0.4),
+                                Theme.of(
+                                  context,
+                                ).colorScheme.primary.withValues(alpha: 0.1),
+                              ],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            ),
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.primary.withValues(alpha: 0.2),
+                                blurRadius: 20,
+                                offset: const Offset(0, 8),
+                              ),
+                            ],
+                          ),
+                          child: CircleAvatar(
+                            radius: 62,
+                            backgroundColor: Theme.of(
+                              context,
+                            ).colorScheme.primary.withValues(alpha: 0.15),
+                            child: Icon(
+                              Icons.person,
+                              size: 80,
+                              color: Theme.of(context).colorScheme.primary,
+                            ),
                           ),
                         ),
-                        const SizedBox(height: 20),
+                        const SizedBox(height: 24),
 
                         // Email (non-editable)
-                        Text(
-                          user.email,
-                          style: TextStyle(
-                            fontSize: 18,
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 12,
+                          ),
+                          decoration: BoxDecoration(
                             color: isDarkTheme
-                                ? Colors.white70
-                                : Colors.black54,
+                                ? Colors.grey[850]
+                                : Colors.grey[100],
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.primary.withValues(alpha: 0.1),
+                              width: 1,
+                            ),
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.email_outlined,
+                                color: Theme.of(context).colorScheme.primary,
+                                size: 20,
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Text(
+                                  user.email,
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w600,
+                                    color: isDarkTheme
+                                        ? Colors.white70
+                                        : Colors.black87,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                         const SizedBox(height: 30),
+
+                        // Form Title
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            "Personal Information",
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w800,
+                              color: isDarkTheme
+                                  ? Colors.white
+                                  : Colors.black87,
+                              letterSpacing: 0.3,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
 
                         // Firstname
                         TextFormField(
                           controller: _firstnameController,
                           style: TextStyle(
                             color: isDarkTheme ? Colors.white : Colors.black,
+                            fontWeight: FontWeight.w600,
                           ),
-                          decoration: _buildInputDecoration(
+                          decoration: _buildModernInputDecoration(
                             "First Name",
+                            Icons.person_outline,
                             isDarkTheme,
                             context,
                           ),
@@ -226,16 +311,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             return null;
                           },
                         ),
-                        const SizedBox(height: 16),
+                        const SizedBox(height: 14),
 
                         // Lastname
                         TextFormField(
                           controller: _lastnameController,
                           style: TextStyle(
                             color: isDarkTheme ? Colors.white : Colors.black,
+                            fontWeight: FontWeight.w600,
                           ),
-                          decoration: _buildInputDecoration(
+                          decoration: _buildModernInputDecoration(
                             "Last Name",
+                            Icons.person_outline,
                             isDarkTheme,
                             context,
                           ),
@@ -266,133 +353,130 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             return null;
                           },
                         ),
+                        const SizedBox(height: 20),
+
+                        // Fitness Title
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            "Fitness Details",
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w800,
+                              color: isDarkTheme
+                                  ? Colors.white
+                                  : Colors.black87,
+                              letterSpacing: 0.3,
+                            ),
+                          ),
+                        ),
                         const SizedBox(height: 16),
 
-                        // Height
-                        TextFormField(
-                          controller: _heightController,
-                          style: TextStyle(
-                            color: isDarkTheme ? Colors.white : Colors.black,
-                          ),
-                          decoration:
-                              _buildInputDecoration(
-                                "Height (cm)",
-                                isDarkTheme,
-                                context,
-                              ).copyWith(
-                                prefixIcon: Icon(
+                        // Height & Weight Row
+                        Row(
+                          children: [
+                            Expanded(
+                              child: TextFormField(
+                                controller: _heightController,
+                                style: TextStyle(
+                                  color: isDarkTheme
+                                      ? Colors.white
+                                      : Colors.black,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                                decoration: _buildModernInputDecoration(
+                                  "Height (cm)",
                                   Icons.straighten,
-                                  color: Theme.of(context).colorScheme.primary,
+                                  isDarkTheme,
+                                  context,
                                 ),
+                                maxLength: 5,
+                                inputFormatters: [
+                                  FilteringTextInputFormatter.allow(
+                                    RegExp(r'[0-9.]'),
+                                  ),
+                                ],
+                                keyboardType: TextInputType.numberWithOptions(
+                                  decimal: true,
+                                ),
+                                validator: (value) {
+                                  if (value == null || value.trim().isEmpty) {
+                                    return "Required";
+                                  }
+                                  final num = double.tryParse(value.trim());
+                                  if (num == null) {
+                                    return "Invalid";
+                                  }
+                                  if (num < 100 || num > 250) {
+                                    return "100-250cm";
+                                  }
+                                  return null;
+                                },
                               ),
-                          maxLength: 5,
-                          inputFormatters: [
-                            FilteringTextInputFormatter.allow(
-                              RegExp(r'[0-9.]'),
                             ),
-                          ],
-                          onChanged: (value) {
-                            if (value.isNotEmpty &&
-                                !RegExp(r'^\d*\.?\d*$').hasMatch(value)) {
-                              _heightController.value = _heightController.value
-                                  .copyWith(
-                                    text: value.replaceAll(
-                                      RegExp(r'[^0-9.]'),
-                                      '',
-                                    ),
-                                  );
-                            }
-                          },
-                          keyboardType: TextInputType.numberWithOptions(
-                            decimal: true,
-                          ),
-                          validator: (value) {
-                            if (value == null || value.trim().isEmpty) {
-                              return "Height is required";
-                            }
-                            final num = double.tryParse(value.trim());
-                            if (num == null) {
-                              return "Invalid height";
-                            }
-                            if (num < 100 || num > 250) {
-                              return "Height must be between 100-250 cm";
-                            }
-                            return null;
-                          },
-                        ),
-                        const SizedBox(height: 16),
-
-                        // Weight
-                        TextFormField(
-                          controller: _weightController,
-                          style: TextStyle(
-                            color: isDarkTheme ? Colors.white : Colors.black,
-                          ),
-                          decoration:
-                              _buildInputDecoration(
-                                "Weight (kg)",
-                                isDarkTheme,
-                                context,
-                              ).copyWith(
-                                prefixIcon: Icon(
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: TextFormField(
+                                controller: _weightController,
+                                style: TextStyle(
+                                  color: isDarkTheme
+                                      ? Colors.white
+                                      : Colors.black,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                                decoration: _buildModernInputDecoration(
+                                  "Weight (kg)",
                                   Icons.monitor_weight,
-                                  color: Theme.of(context).colorScheme.primary,
+                                  isDarkTheme,
+                                  context,
                                 ),
+                                maxLength: 5,
+                                inputFormatters: [
+                                  FilteringTextInputFormatter.allow(
+                                    RegExp(r'[0-9.]'),
+                                  ),
+                                ],
+                                keyboardType: TextInputType.numberWithOptions(
+                                  decimal: true,
+                                ),
+                                validator: (value) {
+                                  if (value == null || value.trim().isEmpty) {
+                                    return "Required";
+                                  }
+                                  final num = double.tryParse(value.trim());
+                                  if (num == null) {
+                                    return "Invalid";
+                                  }
+                                  if (num < 30 || num > 200) {
+                                    return "30-200kg";
+                                  }
+                                  return null;
+                                },
                               ),
-                          maxLength: 5,
-                          inputFormatters: [
-                            FilteringTextInputFormatter.allow(
-                              RegExp(r'[0-9.]'),
                             ),
                           ],
-                          onChanged: (value) {
-                            if (value.isNotEmpty &&
-                                !RegExp(r'^\d*\.?\d*$').hasMatch(value)) {
-                              _weightController.value = _weightController.value
-                                  .copyWith(
-                                    text: value.replaceAll(
-                                      RegExp(r'[^0-9.]'),
-                                      '',
-                                    ),
-                                  );
-                            }
-                          },
-                          keyboardType: TextInputType.numberWithOptions(
-                            decimal: true,
-                          ),
-                          validator: (value) {
-                            if (value == null || value.trim().isEmpty) {
-                              return "Weight is required";
-                            }
-                            final num = double.tryParse(value.trim());
-                            if (num == null) {
-                              return "Invalid weight";
-                            }
-                            if (num < 30 || num > 200) {
-                              return "Weight must be between 30-200 kg";
-                            }
-                            return null;
-                          },
                         ),
-                        const SizedBox(height: 16),
+                        const SizedBox(height: 20),
 
                         // Goal
                         TextFormField(
                           controller: _goalController,
                           style: TextStyle(
                             color: isDarkTheme ? Colors.white : Colors.black,
+                            fontWeight: FontWeight.w600,
                           ),
-                          decoration: _buildInputDecoration(
+                          decoration: _buildModernInputDecoration(
                             "Fitness Goal",
+                            Icons.flag_outlined,
                             isDarkTheme,
                             context,
                           ),
                           maxLength: 100,
+                          minLines: 2,
+                          maxLines: 3,
                           inputFormatters: [
                             FilteringTextInputFormatter.allow(
-                              RegExp(
-                                r'[a-zA-Z0-9\s.,!-]',
-                              ), // Allows letters, numbers, spaces, and basic punctuation
+                              RegExp(r'[a-zA-Z0-9\s.,!-]'),
                             ),
                           ],
                           validator: (value) {
@@ -402,40 +486,67 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             return null;
                           },
                         ),
-                        const SizedBox(height: 30),
+                        const SizedBox(height: 32),
 
-                        // Save Button
+                        // Save Button with modern design
                         SizedBox(
                           width: double.infinity,
-                          child: ElevatedButton(
-                            onPressed: _isSaving
-                                ? null
-                                : () => _saveProfile(user),
-                            style: ElevatedButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(
-                                vertical: 16,
-                                horizontal: 24,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: [
+                                  Theme.of(context).colorScheme.primary,
+                                  Theme.of(
+                                    context,
+                                  ).colorScheme.primary.withValues(alpha: 0.85),
+                                ],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
                               ),
-                              backgroundColor: Theme.of(
-                                context,
-                              ).colorScheme.primary,
-                              foregroundColor: Colors.white,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(30),
-                              ),
-                              elevation: isDarkTheme ? 0 : 6,
+                              borderRadius: BorderRadius.circular(14),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.primary.withValues(alpha: 0.3),
+                                  blurRadius: 12,
+                                  offset: const Offset(0, 6),
+                                ),
+                              ],
                             ),
-                            child: _isSaving
-                                ? const CircularProgressIndicator(
-                                    color: Colors.white,
-                                  )
-                                : const Text(
-                                    "Save Changes",
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
+                            child: ElevatedButton(
+                              onPressed: _isSaving
+                                  ? null
+                                  : () => _saveProfile(user),
+                              style: ElevatedButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 16,
+                                ),
+                                backgroundColor: Colors.transparent,
+                                foregroundColor: Colors.white,
+                                shadowColor: Colors.transparent,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(14),
+                                ),
+                              ),
+                              child: _isSaving
+                                  ? const SizedBox(
+                                      height: 20,
+                                      width: 20,
+                                      child: CircularProgressIndicator(
+                                        color: Colors.white,
+                                        strokeWidth: 2.5,
+                                      ),
+                                    )
+                                  : const Text(
+                                      "Save Changes",
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w800,
+                                        letterSpacing: 0.3,
+                                      ),
                                     ),
-                                  ),
+                            ),
                           ),
                         ),
                         const SizedBox(height: 20),
@@ -494,6 +605,77 @@ class _ProfileScreenState extends State<ProfileScreen> {
         borderSide: BorderSide(color: Colors.redAccent, width: 2.0),
       ),
       errorStyle: const TextStyle(color: Colors.redAccent, fontSize: 14.0),
+    );
+  }
+
+  InputDecoration _buildModernInputDecoration(
+    String label,
+    IconData icon,
+    bool isDarkTheme,
+    BuildContext context,
+  ) {
+    return InputDecoration(
+      labelText: label,
+      labelStyle: TextStyle(
+        fontSize: 13,
+        fontWeight: FontWeight.w600,
+        color: isDarkTheme ? Colors.white54 : Colors.black54,
+      ),
+      hintStyle: TextStyle(
+        fontSize: 14,
+        color: isDarkTheme ? Colors.white38 : Colors.black38,
+      ),
+      prefixIcon: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12),
+        child: Icon(
+          icon,
+          color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.7),
+          size: 20,
+        ),
+      ),
+      prefixIconConstraints: const BoxConstraints(minWidth: 0, minHeight: 0),
+      filled: true,
+      fillColor: isDarkTheme ? Colors.grey[850] : Colors.grey[50],
+      contentPadding: const EdgeInsets.symmetric(
+        vertical: 16.0,
+        horizontal: 16.0,
+      ),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(
+          color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+          width: 1.2,
+        ),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(
+          color: isDarkTheme
+              ? Colors.grey[700]!.withValues(alpha: 0.5)
+              : Colors.grey[300]!,
+          width: 1.2,
+        ),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(
+          color: Theme.of(context).colorScheme.primary,
+          width: 2.0,
+        ),
+      ),
+      errorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: Colors.redAccent, width: 2.0),
+      ),
+      focusedErrorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: Colors.redAccent, width: 2.0),
+      ),
+      errorStyle: const TextStyle(
+        color: Colors.redAccent,
+        fontSize: 12,
+        fontWeight: FontWeight.w600,
+      ),
     );
   }
 }

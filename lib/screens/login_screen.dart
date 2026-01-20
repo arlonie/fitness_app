@@ -131,32 +131,36 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
 
-                  // Heading Text
+                  // Heading Text with better motivational messaging
                   const Text(
                     "Welcome Back!",
                     style: TextStyle(
-                      fontSize: 34,
+                      fontSize: 36,
                       fontWeight: FontWeight.w900,
                       color: Colors.white,
-                      letterSpacing: 1.2,
+                      letterSpacing: 0.5,
                     ),
                   ),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 8),
                   const Text(
-                    "Let's get you moving on your fitness journey!",
+                    "Your fitness journey awaits",
                     textAlign: TextAlign.center,
-                    style: TextStyle(color: Colors.white70, fontSize: 16),
+                    style: TextStyle(
+                      color: Colors.white70,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                   const SizedBox(height: 40),
 
-                  // Email Field
+                  // Email Field with enhanced styling
                   TextField(
                     controller: emailController,
                     style: TextStyle(
                       color: isDarkTheme ? Colors.black : Colors.black87,
                     ),
                     decoration: InputDecoration(
-                      hintText: "Email",
+                      hintText: "Email Address",
                       hintStyle: TextStyle(
                         color: isDarkTheme
                             ? Colors.grey[600]
@@ -170,14 +174,28 @@ class _LoginScreenState extends State<LoginScreen> {
                         horizontal: 20,
                       ),
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(32),
+                        borderRadius: BorderRadius.circular(12),
                         borderSide: BorderSide.none,
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(
+                          color: Colors.grey[300]!,
+                          width: 1,
+                        ),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(
+                          color: Colors.yellowAccent.shade700,
+                          width: 2,
+                        ),
                       ),
                     ),
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 16),
 
-                  // Password Field
+                  // Password Field with enhanced styling
                   TextField(
                     controller: passwordController,
                     style: TextStyle(
@@ -199,8 +217,22 @@ class _LoginScreenState extends State<LoginScreen> {
                         horizontal: 20,
                       ),
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(32),
+                        borderRadius: BorderRadius.circular(12),
                         borderSide: BorderSide.none,
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(
+                          color: Colors.grey[300]!,
+                          width: 1,
+                        ),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(
+                          color: Colors.yellowAccent.shade700,
+                          width: 2,
+                        ),
                       ),
                     ),
                   ),
